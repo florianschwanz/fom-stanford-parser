@@ -7,11 +7,17 @@ version '1.0.0'
 
 repositories {
     mavenCentral()
+    maven {
+        url "http://knowitall.cs.washington.edu/maven2/"
+    }
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile group: 'edu.stanford.nlp', name: 'stanford-parser', version: '3.6.0'
+    compile group: 'edu.stanford.nlp', name: 'stanford-parser', version: '3.9.2'
+    compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.9.2'
+    compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.9.2', classifier: 'models'
+    compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.9.2', classifier: 'models-german'
 }
 
 compileKotlin {
