@@ -3,45 +3,49 @@ package berlin.florianschwanz
 import edu.stanford.nlp.parser.nndep.DependencyParser
 import edu.stanford.nlp.process.DocumentPreprocessor
 import edu.stanford.nlp.tagger.maxent.MaxentTagger
-import edu.stanford.nlp.util.logging.Redwood
 import java.io.StringReader
 
+
+
 /**
- * Demonstrates how to first use the tagger, then use the NN dependency
- * parser. Note that the parser will not work on untagged text.
- *
- * @author Jon Gauthier
+ * Application that
  */
 object App {
 
-    private val log = Redwood.channels(App::class.java)
-
+    /**
+     * Main function
+     */
     @JvmStatic
     fun main(args: Array<String>) {
-        var modelPath = DependencyParser.DEFAULT_MODEL
-        var taggerPath = PosTagger.ENGLISH_LEFT3_WORDS_DISTSIM
-
-        // Set example sentence
-        var text = "I can almost always tell when movies use fake dinosaurs."
-        // var text = "Dieses Beispiel zeigt die Struktur eines Satzes nach dem Prinzip der Dependenz."
+        var taggerPath = ""
+        var modelPath = ""
+        var text = ""
 
         var argIndex = 0
 
-        args.forEach { a ->
-            println(a)
-        }
-
         while (argIndex < args.size) {
             when (args[argIndex]) {
-                "-tagger" -> {
+                "--english" -> {
+                    // Preconfigure English parser
+                    taggerPath = PosTagger.ENGLISH_LEFT3_WORDS_DISTSIM
+                    modelPath = Model.ENGLISH_UD_MODEL
+                    argIndex += 1
+                }
+                "--german" -> {
+                    // Preconfigure German parser
+                    taggerPath = PosTagger.GERMAN_UD_TAGGER
+                    modelPath = Model.GERMAN_UD_MODEL
+                    argIndex += 1
+                }
+                "--tagger" -> {
                     taggerPath = args[argIndex + 1]
                     argIndex += 2
                 }
-                "-model" -> {
+                "--model" -> {
                     modelPath = args[argIndex + 1]
                     argIndex += 2
                 }
-                "-text" -> {
+                "--text" -> {
                     text = args[argIndex + 1]
                     argIndex += 2
                 }
@@ -49,16 +53,27 @@ object App {
             }
         }
 
+        if (taggerPath.isBlank()) {
+            throw RuntimeException("Missing tagger. Please specify path to tagger using --tagger flag")
+        }
+
+        if (modelPath.isBlank()) {
+            throw RuntimeException("Missing model. Please specify path to model using --model flag")
+        }
+
+        if (text.isBlank()) {
+            throw RuntimeException("Missing text. Please specify sentence to be analyzed using --text flag")
+        }
+
         val tagger = MaxentTagger(taggerPath)
         val parser = DependencyParser.loadFromModelFile(modelPath)
-
         val tokenizer = DocumentPreprocessor(StringReader(text))
+
         for (sentence in tokenizer) {
             val tagged = tagger.tagSentence(sentence)
             val gs = parser.predict(tagged)
 
-            // Print grammar
-            log.info(gs.toString())
+            println(gs.toString())
         }
     }
 }
