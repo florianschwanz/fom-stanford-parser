@@ -8,81 +8,80 @@ It is based on [DependencyParserDemo.java](https://github.com/stanfordnlp/CoreNL
 
 ## Getting started
 
-### Run basic example
+### Run constituency parser English
 
-You can run a basic example that uses _english-left3words-distsim_ by simly calling
-
-```
-./gradlew run --args="--english --text 'I can almost always tell when movies use fake dinosaurs.'"
-```
-
-which is equal to
+You can run a basic example by calling
 
 ```
-./gradlew run --args="-tagger edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger --model edu/stanford/nlp/models/parser/nndep/english_UD.gz  --text 'I can almost always tell when movies use fake dinosaurs.'"
+./gradlew run --args="--type constituency --language english --text 'I can almost always tell when movies use fake dinosaurs.'"
 ```
 
 Based on the sample text _"I can almost always tell when movies use fake dinosaurs."_ the output should look something like that
 
 ```
-[main] INFO edu.stanford.nlp.tagger.maxent.MaxentTagger - Loading POS tagger from edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger ... done [2.0 sec].
-[main] INFO edu.stanford.nlp.parser.nndep.DependencyParser - Loading depparse model: edu/stanford/nlp/models/parser/nndep/english_UD.gz ... 
-[main] INFO edu.stanford.nlp.parser.nndep.Classifier - PreComputed 99996, Elapsed Time: 29.219 (s)
-[main] INFO edu.stanford.nlp.parser.nndep.DependencyParser - Initializing dependency parser ... done [33.3 sec].
-ROOT-0{CharacterOffsetBeginAnnotation=-1, CharacterOffsetEndAnnotation=-1, PartOfSpeechAnnotation=null, TextAnnotation=ROOT}Typed Dependencies:
-[nsubj(tell-5, I-1), aux(tell-5, can-2), advmod(always-4, almost-3), advmod(tell-5, always-4), root(ROOT-0, tell-5), advmod(use-8, when-6), nsubj(use-8, movies-7), advcl(tell-5, use-8), amod(dinosaurs-10, fake-9), dobj(use-8, dinosaurs-10), punct(tell-5, .-11)]
+(ROOT (S (NP (PRP I)) (VP (MD can) (ADVP (RB almost) (RB always)) (VP (VB tell) (SBAR (WHADVP (WRB when)) (S (NP (NNS movies)) (VP (VBP use) (NP (JJ fake) (NNS dinosaurs))))))) (. .)))
 ```
 
-* the parse tree contained in the output looks like this
+### Run dependency parser English
+
+You can run a basic example by calling
 
 ```
-[
-    nsubj(tell-5, I-1), 
-    aux(tell-5, can-2), 
-    advmod(always-4, almost-3), 
-    advmod(tell-5, always-4), 
-    root(ROOT-0, tell-5), 
-    advmod(use-8, when-6), 
-    nsubj(use-8, movies-7), 
-    advcl(tell-5, use-8), 
-    amod(dinosaurs-10, fake-9), 
-    dobj(use-8, dinosaurs-10), 
-    punct(tell-5, .-11)
-]
+./gradlew run --args="--type dependency --language english --text 'I can almost always tell when movies use fake dinosaurs.'"
 ```
 
-
-### German example
-
-You can pass a different parser and a German sentence by calling
+Based on the sample text _"I can almost always tell when movies use fake dinosaurs."_ the output should look something like that
 
 ```
-./gradlew run --args="-tagger edu/stanford/nlp/models/pos-tagger/german/german-ud.tagger -text 'Dieses Beispiel zeigt die Struktur eines Satzes nach dem Prinzip der Depend
-enz.'"
+root(ROOT-0, tell-5)
+nsubj(tell-5, I-1)
+aux(tell-5, can-2)
+advmod(always-4, almost-3)
+advmod(tell-5, always-4)
+advmod(use-8, when-6)
+nsubj(use-8, movies-7)
+advcl(tell-5, use-8)
+amod(dinosaurs-10, fake-9)
+dobj(use-8, dinosaurs-10)
+punct(tell-5, .-11)
 ```
 
-Based on the sample text the output should look something like that
+### Run constituency parser German
+
+You can run a basic example by calling
 
 ```
-[main] INFO berlin.florianschwanz.App - ROOT-0{CharacterOffsetBeginAnnotation=-1, CharacterOffsetEndAnnotation=-1, PartOfSpeechAnnotation=null, TextAnnotation=ROOT}Typed Dependencies:
-[dep(Dependenz-12, Dieses-1), dep(Dependenz-12, Beispiel-2), dep(Dependenz-12, zeigt-3), dep(Dependenz-12, die-4), compound(Dependenz-12, Struktur-5), compound(Dependenz-12, eines-6), compound(Dependenz-12, Sat
-zes-7), compound(Dependenz-12, nach-8), compound(Dependenz-12, dem-9), compound(Dependenz-12, Prinzip-10), compound(Dependenz-12, der-11), root(ROOT-0, Dependenz-12), punct(Dependenz-12, .-13)]
+./gradlew run --args="--type constituency --language german --text 'Ich kann meistens feststellen, wenn in Filmen unechte Dinosaurier verwendet werden.'"
 ```
 
-```
-[
-    dep(Dependenz-12, Dieses-1), 
-    dep(Dependenz-12, Beispiel-2), 
-    dep(Dependenz-12, zeigt-3), 
-    dep(Dependenz-12, die-4), 
-    compound(Dependenz-12, Struktur-5), 
-    compound(Dependenz-12, eines-6), 
-    compound(Dependenz-12, Satzes-7), 
-    compound(Dependenz-12, nach-8), compound(Dependenz-12, dem-9), 
-    compound(Dependenz-12, Prinzip-10), 
-    compound(Dependenz-12, der-11), 
-    root(ROOT-0, Dependenz-12), 
-    punct(Dependenz-12, .-13)
-]
+Based on the sample text _"Ich kann meistens feststellen, wenn in Filmen unechte Dinosaurier verwendet werden."_ the output should look something like that
 
+```
+(ROOT (CO (PRON Ich) (AUX kann) (ADV meistens) (VERB feststellen) (PUNCT ,) (SCONJ wenn) (ADP in) (NOUN Filmen) (ADJ unechte) (NOUN Dinosaurier) (VERB verwendet) (AUX werden) (PUNCT .)))
+```
+
+### Run dependency parser German
+
+You can run a basic example by calling
+
+```
+./gradlew run --args="--type dependency --language german --text 'Ich kann meistens feststellen, wenn in Filmen unechte Dinosaurier verwendet werden.'"
+```
+
+Based on the sample text _"Ich kann meistens feststellen, wenn in Filmen unechte Dinosaurier verwendet werden."_ the output should look something like that
+
+```
+root(ROOT-0, feststellen-4)
+nsubj(feststellen-4, Ich-1)
+aux(feststellen-4, kann-2)
+advmod(feststellen-4, meistens-3)
+punct(feststellen-4, ,-5)
+mark(verwendet-11, wenn-6)
+case(Filmen-8, in-7)
+nmod(verwendet-11, Filmen-8)
+amod(Dinosaurier-10, unechte-9)
+det(Filmen-8, Dinosaurier-10)
+advcl(feststellen-4, verwendet-11)
+auxpass(verwendet-11, werden-12)
+punct(feststellen-4, .-13)
 ```

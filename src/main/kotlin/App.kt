@@ -1,10 +1,15 @@
 package berlin.florianschwanz
 
-import edu.stanford.nlp.parser.nndep.DependencyParser
-import edu.stanford.nlp.process.DocumentPreprocessor
-import edu.stanford.nlp.tagger.maxent.MaxentTagger
-import java.io.StringReader
-
+import berlin.florianschwanz.config.Annotator
+import berlin.florianschwanz.config.Model
+import berlin.florianschwanz.config.PosTagger
+import edu.stanford.nlp.ling.CoreAnnotations
+import edu.stanford.nlp.pipeline.Annotation
+import edu.stanford.nlp.pipeline.StanfordCoreNLP
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations
+import edu.stanford.nlp.trees.TreeCoreAnnotations
+import edu.stanford.nlp.util.PropertiesUtils
+import java.util.*
 
 
 /**
@@ -12,30 +17,78 @@ import java.io.StringReader
  */
 object App {
 
+    var type = ""
+    var text = ""
+
+    val LANG_GERMAN = "german"
+    val LANG_ENGLISH = "english"
+
+    val TYPE_CONSTITUENCY = "constituency"
+    val TYPE_DEPENDENCY = "dependency"
+
     /**
      * Main function
      */
     @JvmStatic
     fun main(args: Array<String>) {
+
+        // Build properties
+        val props = evaluateArguments(args)
+
+        // Initialize document
+        val document = Annotation(text)
+
+        // Annotate
+        val pipeline = StanfordCoreNLP(props)
+        pipeline.annotate(document)
+
+        // Iterate over sentences in text
+        document.get(CoreAnnotations.SentencesAnnotation::class.java).forEach { sentence ->
+            when (type) {
+                TYPE_CONSTITUENCY -> {
+                    println("----- Constituency Parse")
+                    val pasrse = sentence.get(TreeCoreAnnotations.TreeAnnotation::class.java)
+                    println(pasrse)
+                }
+
+                TYPE_DEPENDENCY -> {
+                    println("----- Dependency Parse")
+                    val pasrse = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation::class.java)
+                    println(pasrse.toList())
+                }
+            }
+        }
+    }
+
+    /**
+     * Evaluates command line arguments and builds a properties object based on them
+     *
+     * @param args arguments
+     * @return properties
+     */
+    private fun evaluateArguments(args: Array<String>): Properties {
+        println("--- Arguments")
+        args.forEach {
+            println(it)
+        }
+
+        var language = ""
+        var parseAnnotator = ""
         var taggerPath = ""
+        var modelProperty = ""
         var modelPath = ""
-        var text = ""
 
         var argIndex = 0
 
         while (argIndex < args.size) {
             when (args[argIndex]) {
-                "--english" -> {
-                    // Preconfigure English parser
-                    taggerPath = PosTagger.ENGLISH_LEFT3_WORDS_DISTSIM
-                    modelPath = Model.ENGLISH_UD_MODEL
-                    argIndex += 1
+                "--language" -> {
+                    language = args[argIndex + 1]
+                    argIndex += 2
                 }
-                "--german" -> {
-                    // Preconfigure German parser
-                    taggerPath = PosTagger.GERMAN_UD_TAGGER
-                    modelPath = Model.GERMAN_UD_MODEL
-                    argIndex += 1
+                "--type" -> {
+                    type = args[argIndex + 1]
+                    argIndex += 2
                 }
                 "--tagger" -> {
                     taggerPath = args[argIndex + 1]
@@ -53,27 +106,59 @@ object App {
             }
         }
 
-        if (taggerPath.isBlank()) {
-            throw RuntimeException("Missing tagger. Please specify path to tagger using --tagger flag")
-        }
+        when (language) {
+            LANG_GERMAN -> {
+                when (type) {
+                    TYPE_CONSTITUENCY -> {
+                        parseAnnotator = Annotator.PARSE
+                        taggerPath = PosTagger.GERMAN_UD_TAGGER
+                        modelProperty = "parse.model"
+                        modelPath = Model.GERMAN_PCFG_MODEL
+                    }
+                    TYPE_DEPENDENCY -> {
+                        parseAnnotator = Annotator.DEP_PARSE
+                        taggerPath = PosTagger.GERMAN_UD_TAGGER
+                        modelProperty = "depparse.model"
+                        modelPath = Model.GERMAN_UD_MODEL
+                    }
+                }
+            }
 
-        if (modelPath.isBlank()) {
-            throw RuntimeException("Missing model. Please specify path to model using --model flag")
+            LANG_ENGLISH -> {
+                when (type) {
+                    TYPE_CONSTITUENCY -> {
+                        parseAnnotator = Annotator.PARSE
+                        taggerPath = PosTagger.ENGLISH_LEFT3_WORDS_DISTSIM
+                        modelProperty = "parse.model"
+                        modelPath = Model.ENGLISH_PCFG_MODEL
+                    }
+                    TYPE_DEPENDENCY -> {
+                        parseAnnotator = Annotator.DEP_PARSE
+                        taggerPath = PosTagger.ENGLISH_LEFT3_WORDS_DISTSIM
+                        modelProperty = "depparse.model"
+                        modelPath = Model.ENGLISH_UD_MODEL
+                    }
+                }
+            }
         }
 
         if (text.isBlank()) {
             throw RuntimeException("Missing text. Please specify sentence to be analyzed using --text flag")
         }
 
-        val tagger = MaxentTagger(taggerPath)
-        val parser = DependencyParser.loadFromModelFile(modelPath)
-        val tokenizer = DocumentPreprocessor(StringReader(text))
+        println("--- Configuration")
+        println("language $language")
+        println("type $type")
+        println("parseAnnotator $parseAnnotator")
+        println("taggerPath $taggerPath")
+        println("modelPath $modelPath")
+        println("text $text")
 
-        for (sentence in tokenizer) {
-            val tagged = tagger.tagSentence(sentence)
-            val gs = parser.predict(tagged)
-
-            println(gs.toString())
-        }
+        // Set properties
+        return PropertiesUtils.asProperties(
+            "annotators", "tokenize,ssplit,pos,lemma,$parseAnnotator",
+            "pos.model", taggerPath,
+            modelProperty, modelPath
+        )
     }
 }

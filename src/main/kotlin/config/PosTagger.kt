@@ -1,5 +1,8 @@
-package berlin.florianschwanz
+package berlin.florianschwanz.config
 
+/**
+ * Object containing taggers
+ */
 object PosTagger {
 
     private val basePath = "edu/stanford/nlp/models/pos-tagger/"
