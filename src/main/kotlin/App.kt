@@ -10,6 +10,7 @@ import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations
 import edu.stanford.nlp.trees.TreeCoreAnnotations
 import edu.stanford.nlp.util.PropertiesUtils
 import java.util.*
+import kotlin.system.exitProcess
 
 
 /**
@@ -46,15 +47,13 @@ object App {
         document.get(CoreAnnotations.SentencesAnnotation::class.java).forEach { sentence ->
             when (type) {
                 TYPE_CONSTITUENCY -> {
-                    println("----- Constituency Parse")
-                    val pasrse = sentence.get(TreeCoreAnnotations.TreeAnnotation::class.java)
-                    println(pasrse)
+                    val parse = sentence.get(TreeCoreAnnotations.TreeAnnotation::class.java)
+                    println(parse)
                 }
 
                 TYPE_DEPENDENCY -> {
-                    println("----- Dependency Parse")
-                    val pasrse = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation::class.java)
-                    println(pasrse.toList())
+                    val parse = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation::class.java)
+                    println(parse.toList())
                 }
             }
         }
@@ -67,11 +66,6 @@ object App {
      * @return properties
      */
     private fun evaluateArguments(args: Array<String>): Properties {
-        println("--- Arguments")
-        args.forEach {
-            println(it)
-        }
-
         var language = ""
         var parseAnnotator = ""
         var taggerPath = ""
@@ -101,6 +95,16 @@ object App {
                 "--text" -> {
                     text = args[argIndex + 1]
                     argIndex += 2
+                }
+                "--help" -> {
+                    println("USAGE: ./gradlew run --args\"[options...]\"")
+                    println("options:")
+                    println("--language {german|english}      Language")
+                    println("--type {constituency|dependency} Type of parser")
+                    println("[--tagger <tagger>]              Path to tagger (optional)")
+                    println("[--model <model>]                Path to model (optional)")
+                    println("--text <text>                    Text to be parsed")
+                    exitProcess(0)
                 }
                 else -> throw RuntimeException("Unknown argument " + args[argIndex])
             }
