@@ -57,7 +57,7 @@ You can run a basic example by calling
 Based on the sample text _"Ich kann meistens feststellen, wenn in Filmen unechte Dinosaurier verwendet werden."_ the output should look something like that
 
 ```
-(ROOT (NUR (PRON Ich) (S (AUX kann) (ADV meistens) (VERB feststellen) (PUNCT ,) (SCONJ wenn) (ADP in) (NOUN Filmen) (ADJ unechte) (NOUN Dinosaurier) (VERB verwendet) (AUX werden)) (PUNCT .)))
+(ROOT (S (PPER Ich) (VMFIN kann) (VP (ADV meistens) (VVINF feststellen) ($, ,) (S (KOUS wenn) (PP (APPR in) (NN Filmen)) (NP (ADJA unechte) (NN Dinosaurier)) (VP (VVPP verwendet)) (VAINF werden))) ($. .)))
 ```
 
 ### Run dependency parser German

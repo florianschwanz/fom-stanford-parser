@@ -115,7 +115,7 @@ object App {
                 when (type) {
                     TYPE_CONSTITUENCY -> {
                         parseAnnotator = Annotator.PARSE
-                        taggerPath = PosTagger.GERMAN_UD_TAGGER
+                        taggerPath = PosTagger.GERMAN_FAST_TAGGER
                         modelProperty = "parse.model"
                         modelPath = Model.GERMAN_SR_PARSER
                     }
