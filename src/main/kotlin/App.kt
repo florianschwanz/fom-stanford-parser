@@ -117,7 +117,7 @@ object App {
                         parseAnnotator = Annotator.PARSE
                         taggerPath = PosTagger.GERMAN_UD_TAGGER
                         modelProperty = "parse.model"
-                        modelPath = Model.GERMAN_PCFG_MODEL
+                        modelPath = Model.GERMAN_SR_PARSER
                     }
                     TYPE_DEPENDENCY -> {
                         parseAnnotator = Annotator.DEP_PARSE
@@ -134,7 +134,7 @@ object App {
                         parseAnnotator = Annotator.PARSE
                         taggerPath = PosTagger.ENGLISH_LEFT3_WORDS_DISTSIM
                         modelProperty = "parse.model"
-                        modelPath = Model.ENGLISH_PCFG_MODEL
+                        modelPath = Model.ENGLISH_SR_PARSER
                     }
                     TYPE_DEPENDENCY -> {
                         parseAnnotator = Annotator.DEP_PARSE
